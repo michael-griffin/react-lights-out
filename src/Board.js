@@ -39,6 +39,8 @@ function Board({ nrows, ncols, chanceLightStartsOn }) {
 
   function hasWon() {
     // TODO: check the board in state to determine whether the player has won.
+    let flattened = board.flat();
+    return !flattened.any(val => val);
   }
 
   function flipCellsAround(coord) {
@@ -67,7 +69,23 @@ function Board({ nrows, ncols, chanceLightStartsOn }) {
 
   // make table board
 
+
+  //TODO: should this be a function?
+  let cells = [];
+  for (let row = 0; row < board.length; row++){
+    for (let col = 0; col < row.length; col++){
+      let cell = <Cell key={`${row}-${col}`} coord={`${row}-${col}`}
+        isLit={board[row][col]} flipCellsAround={flipCellsAround} />;
+      cells.push(cell);
+    }
+  }
+
   // TODO
+  return (
+    <div className="Board">
+      {cells}
+    </div>
+  )
 }
 
 export default Board;
