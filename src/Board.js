@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Cell from "./Cell";
 import "./Board.css";
+import { createBoard, hasWon } from "./utils";
 
 const NCOLS = 6;
 const NROWS = 6;
@@ -34,40 +35,13 @@ const CHANCE_LIGHTS_START_ON = .4;
 function Board({ nrows=NROWS, ncols=NCOLS, chanceLightStartsOn=CHANCE_LIGHTS_START_ON }) {
   const [board, setBoard] = useState(createBoard(nrows, ncols, chanceLightStartsOn));
 
-  /** create a board nrows high/ncols wide, each cell randomly lit or unlit */
-  //TODO: move out createBoard function.
-  function createBoard(nrows, ncols, chanceLightStartsOn) {
-    let initialBoard = [];
-
-    // TODO: create array-of-arrays of true/false values
-    for (let row = 0; row < nrows; row++) {
-      const row = [];
-      for (let col = 0; col < ncols; col++) {
-        const isLit = Math.random() < chanceLightStartsOn;
-        row.push(isLit);
-      }
-      initialBoard.push(row);
-    }
-
-    return initialBoard;
-  }
-
-  //TODO: hasWon can move to utils.
-  /** flatten the board, check if any are Lit. If none are, you've won*/
-  function hasWon() {
-    // TODO: check the board in state to determine whether the player has won.
-    let flattened = board.flat(); //chain .some (and return);
-    return !flattened.some(val => val);
-  }
 
   /** flips cells + neighbors lit property (unlit become lit, and vice versa)
    *  sets board state to new board with flipped cells.  */
-
-  //TODO: pass coord as argument, put coord in callback for cell
   function flipCellsAround(coord) {
 
     setBoard(oldBoard => {
-      //TODO: move the functions out!
+
       const [y, x] = coord.split("-").map(Number);
 
       // Make a (deep) copy of the oldBoard
@@ -99,20 +73,24 @@ function Board({ nrows=NROWS, ncols=NCOLS, chanceLightStartsOn=CHANCE_LIGHTS_STA
     });
   }
 
-
-  //This should be a function
-  let cells = [];
-  for (let row = 0; row < board.length; row++) {
-    for (let col = 0; col < board[0].length; col++) {
-      let cell = <Cell key={`${row}-${col}`} coord={`${row}-${col}`}
-        isLit={board[row][col]} flipCellsAround={flipCellsAround} />;
-      cells.push(cell);
+  function makeCells() {
+    let cells = [];
+    for (let row = 0; row < board.length; row++) {
+      for (let col = 0; col < board[0].length; col++) {
+        let cell = <Cell key={`${row}-${col}`} coord={`${row}-${col}`}
+          isLit={board[row][col]} flipCellsAround={flipCellsAround} />;
+        cells.push(cell);
+      }
     }
+    return cells;
   }
+
+  const cells = makeCells();
+  console.log("cells", cells);
 
   return (
     <div className="Board">
-      {hasWon()
+      {hasWon(board)
         ? <p>You have won!</p>
         : <>{cells}</>
       }
